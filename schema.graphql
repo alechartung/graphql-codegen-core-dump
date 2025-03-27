@@ -1,0 +1,111 @@
+# User type with various fields and relationships
+type User {
+  id: ID!
+  username: String!
+  email: String!
+  fullName: String
+  age: Int
+  profile: Profile
+  posts: [Post!]
+  followers: [User!]
+  joinedAt: String
+}
+
+# Profile type with additional user details
+type Profile {
+  id: ID!
+  bio: String
+  location: String
+  website: String
+  user: User!
+}
+
+# Post type showing relationships and nested types
+type Post {
+  id: ID!
+  title: String!
+  content: String!
+  author: User!
+  comments: [Comment!]
+  tags: [String!]
+  createdAt: String!
+  likes: Int
+}
+
+# Comment type with nested relationships
+type Comment {
+  id: ID!
+  text: String!
+  author: User!
+  post: Post!
+  parentComment: Comment
+  replies: [Comment!]
+  createdAt: String!
+}
+
+# Enum for sorting options
+enum SortOrder {
+  ASC
+  DESC
+}
+
+# Input type for creating a new user
+input CreateUserInput {
+  username: String!
+  email: String!
+  fullName: String
+  age: Int
+}
+
+# Input type for creating a new post
+input CreatePostInput {
+  title: String!
+  content: String!
+  authorId: ID!
+  tags: [String!]
+}
+
+# Query type defining available queries
+type Query {
+  # User-related queries
+  user(id: ID!): User
+  users(limit: Int, offset: Int): [User!]
+  searchUsers(username: String): [User!]
+
+  # Post-related queries
+  post(id: ID!): Post
+  posts(
+    limit: Int,
+    offset: Int,
+    sortBy: String,
+    sortOrder: SortOrder
+  ): [Post!]
+
+  # Search and filter queries
+  searchPosts(query: String, tags: [String!]): [Post!]
+}
+
+# Mutation type defining available mutations
+type Mutation {
+  # User mutations
+  createUser(input: CreateUserInput!): User!
+  updateUser(id: ID!, input: CreateUserInput): User
+  deleteUser(id: ID!): Boolean!
+
+  # Post mutations
+  createPost(input: CreatePostInput!): Post!
+  updatePost(id: ID!, input: CreatePostInput): Post
+  deletePost(id: ID!): Boolean!
+
+  # Interaction mutations
+  followUser(userId: ID!): User
+  unfollowUser(userId: ID!): User
+  likePost(postId: ID!): Post
+}
+
+# Subscription type for real-time updates
+type Subscription {
+  newPost: Post!
+  newComment(postId: ID!): Comment!
+  userFollowed(userId: ID!): User!
+}
